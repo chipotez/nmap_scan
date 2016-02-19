@@ -1,0 +1,54 @@
+Para Obtener la información primero ejecutamos:
+    # nmap -T4 -A -v Red_a_Analizar
+
+Despues de guardar la salida en un file aplicamos filtros:
+    #egrep -e "Nmap scan report for" -e "Service Info:"  -e "22/tcp" -B2 -A2  nmap_T4Av_10.180.48.11-250.out >> filtro1.txt
+
+Ejemplo de Salida:
+    
+    Nmap scan report for Server.dominio.com  (XXX.YYY.ZZZ.251)
+    Host is up (0.00045s latency).
+    Not shown: 968 closed ports
+    --
+    21/tcp    open  ftp               Solaris ftpd
+    |_auth-owners: root
+    22/tcp    open  ssh               OpenSSH 4.5p1+sftpfilecontrol-v1.1-hpn12v14 (protocol 2.0)
+    |_auth-owners: root
+    | ssh-hostkey: 1024 6a:19:d9:c3:7d:a3:47:68:9a:b2:f4:7f:ee:65:dc:22 (DSA)
+    --
+    TCP Sequence Prediction: Difficulty=154 (Good luck!)
+    IP ID Sequence Generation: Incremental
+    Service Info: OSs: HP-UX, Solaris, Unix, Linux
+
+    Nmap scan report for XXX.YYY.ZZZ.252
+    Host is up (0.0013s latency).
+    Not shown: 998 closed ports
+    TCP Sequence Prediction: Difficulty=259 (Good luck!)
+    IP ID Sequence Generation: Randomized
+    Service Info: OS: IOS; Device: router
+
+    Nmap scan report for Server.dominio.com (XXX.YYY.ZZZ.253)
+    Host is up (0.00032s latency).
+    Not shown: 992 closed ports
+    TCP Sequence Prediction: Difficulty=258 (Good luck!)
+    IP ID Sequence Generation: Incremental
+    Service Info: OS: Windows
+    
+  Una vez que tenemos redireccionada nuestra salida, buscamos los S.O.y contamos.
+  
+      # cat filtro1.txt | grep "Service Info: OS:"
+      # cat filtro1.txt | grep "Service Info: OS:" | wc -l
+    
+    En lo personal valido la  información con la salida de otro comando: 
+      # nmap -T4 -F Red_a_Analizar
+    Salida:
+        Nmap done: 254 IP addresses (161 hosts up) scanned in 29.85 seconds
+    
+    En este caso no coindicen mis salidas:
+      $ cat filtro1.txt | grep "Service Info: OS:" | wc -l
+        **69**
+      $ nmap -T4 -F Red_a_Analizar
+        Nmap done: 254 IP addresses (**161 hosts up**) scanned in 29.85 seconds
+    
+    
+    
