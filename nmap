@@ -70,9 +70,9 @@ Ejemplo de Salida:
     
     Filtramos, ordenamos y mostramos los hostname e ip
     egrep -i -e "nmap scan report for" nmap_T4Av_10.184.56.11-250.out  | awk '{print $5"\t"$6}' | sort -n
-        fcrmsp02.femcom.net	(10.184.56.64)
-        fctabprd01.comercio.fne	(10.184.56.85)
-        test2.femcom.net	(10.184.56.33)
+        <hostname>	(10.184.56.64)
+        <hostname>	(10.184.56.85)
+        <hostname>	(10.184.56.33)
         10.184.56.100	
         10.184.56.101	
         10.184.56.102	
@@ -81,4 +81,68 @@ Ejemplo de Salida:
    egrep -i -e "nmap scan report for" nmap_T4Av_10.184.56.11-250.out  | awk '{print $5"\t"$6}' | sort -n | wc -l
         71
    
+    Ahora hacemos match entre las ip y los servicios:
+    egrep -i -e "Nmap scan report for"  -e "Service info"  nmap_T4Av_10.184.56.11-250.out | grep "Service Info:" -B1 > nmap_service
+    
+        Nmap scan report for <hostname> (10.184.56.82)
+        Service Info: OS: Unix
+        Nmap scan report for <hostname> (10.184.56.83)
+        Service Info: OS: Unix
+        Nmap scan report for <hostname> (10.184.56.84)
+        Service Info: OS: Unix
+        Nmap scan report for <hostname> (10.184.56.85)
+        Service Info: OS: Windows
+        Nmap scan report for <hostname> (10.184.56.86)
+        Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        Nmap scan report for <hostname> (10.184.56.88)
+        Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
+    
+    Ahora ya tenemos filtrada la información por orden de ip, y el tipo la info del sistema, como ya esta ordenado 
+    ahora separaremos la info para al al final unirla en una linea y hacer copy paste.
+    
+    cat nmap_serviceinfo | grep Nmap > nmap_serviceinfo_file_nmap
+        Nmap scan report for <hostname> (10.184.56.90)
+        Nmap scan report for <hostname> (10.184.56.92)
+        Nmap scan report for <hostname> (10.184.56.96)
+        Nmap scan report for 10.184.56.100
+        Nmap scan report for 10.184.56.101
+
+    cat nmap_serviceinfo | grep Service > nmap_serviceinfo_file_service
+        Service Info: OS: Windows
+        Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        Service Info: OSs: HP-UX, Solaris, Unix, Linux
+        Service Info: OS: Unix
+        Service Info: OS: Unix
+        Service Info: OS: Unix
+
+    Ahora uniremos todo en una linea
+    
+        paste nmap_serviceinfo_file_nmap nmap_serviceinfo_file_service > nmap_serviceinfo_file_union
+            Nmap scan report for <hostname> (10.184.56.92)	Service Info: OSs: HP-UX, Unix, HP-UX 11.31
+            Nmap scan report for <hostname> (10.184.56.96)	Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
+            Nmap scan report for 10.184.56.100	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+            Nmap scan report for 10.184.56.101	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+            Nmap scan report for 10.184.56.103	Service Info: OSs: Unix, Linux
+            Nmap scan report for 10.184.56.104	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
