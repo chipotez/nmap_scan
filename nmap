@@ -50,6 +50,7 @@ Ejemplo de Salida:
       $ nmap -T4 -F Red_a_Analizar
         Nmap done: 254 IP addresses (**161 hosts up**) scanned in 29.85 seconds
     
+    ============================ Test 2 
     
     ejecutaremos otro filtro hasta que coincidan las salidas de cada busqueda ya que es la unica 
     forma en la cual podremos identificar cada equipos 
@@ -118,18 +119,151 @@ Ejemplo de Salida:
 
     Ahora uniremos todo en una linea
     
-        paste nmap_serviceinfo_file_nmap nmap_serviceinfo_file_service > nmap_serviceinfo_file_union
-            Nmap scan report for <hostname> (10.184.56.92)	Service Info: OSs: HP-UX, Unix, HP-UX 11.31
-            Nmap scan report for <hostname> (10.184.56.96)	Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
-            Nmap scan report for 10.184.56.100	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
-            Nmap scan report for 10.184.56.101	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
-            Nmap scan report for 10.184.56.103	Service Info: OSs: Unix, Linux
-            Nmap scan report for 10.184.56.104	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+    paste nmap_serviceinfo_file_nmap nmap_serviceinfo_file_service > nmap_serviceinfo_file_union
+        Nmap scan report for <hostname> (10.184.56.92)	Service Info: OSs: HP-UX, Unix, HP-UX 11.31
+        Nmap scan report for <hostname> (10.184.56.96)	Service Info: OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        Nmap scan report for 10.184.56.100	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        Nmap scan report for 10.184.56.101	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        Nmap scan report for 10.184.56.103	Service Info: OSs: Unix, Linux
+        Nmap scan report for 10.184.56.104	Service Info: Host: <hostname>; OSs: HP-UX, Unix, HP-UX 11.31, Linux
+        
+    Para el resto de equipos que no encontramos información la versión de sistema, tipo de sistema, 
+    buscaremos la secuencia de la firma, esta secuencia es la que ayuda a identificar el SO, cuando 
+    la secuencia no se encuentra es debido a que la base de datos de Nmap no esta actualizada y podemos enviar 
+    la info para su registro, por ello es importante siempre usar la version más actulizada de nmap.
+    (en este filtro especifique OS:x86_64-redhat-linux-gnu.SEQ.SP= por que conozco la versiń del SO, para la 
+    que fue complidad nmap)
+    
+    egrep -i -e "Nmap scan report for" -e "OS:x86_64-redhat-linux-gnu.SEQ.SP=" -e "Service Info"  nmap_T4Av_10.184.56.11-250.out | grep "OS:x86_64-redhat-linux-gnu.SEQ.SP=" -B1 >nmap_serviceinfo_file_SEQ
+
+        Nmap scan report for fcmexch04.comercio.fne (10.184.56.42)
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=104%GCD=1%ISR=107%TI=I%CI=I%II=I%SS=O%TS=
+        --
+        Nmap scan report for fcmexch05.comercio.fne (10.184.56.43)
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=107%GCD=1%ISR=10D%TI=I%CI=I%II=I%SS=S%TS=
+        --
+        Nmap scan report for 10.184.56.45
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=FE%GCD=1%ISR=10C%TI=I%CI=I%II=I%SS=S%TS=7
+        --
+        Nmap scan report for 10.184.56.102
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=106%GCD=1%ISR=10E%TI=Z%CI=Z%II=I%TS=U)OPS
+        Nmap scan report for 10.184.56.103
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=87%GCD=1%ISR=9B%TI=I%CI=I%II=I%SS=S%TS=7)
+        --
+        Nmap scan report for 10.184.56.105
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=FB%GCD=1%ISR=FF%TI=Z%CI=Z%II=I%TS=U)OPS(O
+        
+
+    cat nmap_serviceinfo_file_SEQ | grep -i OS:x86_64-redhat-linux-gnu > nmap_serviceinfo_file_SEQ_1
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=103%GCD=1%ISR=10C%TI=Z%CI=Z%II=I%TS=U)OPS
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=FD%GCD=1%ISR=10A%TI=Z%CI=Z%II=I%TS=U)OPS(
+        OS:x86_64-redhat-linux-gnu)SEQ(SP=106%GCD=1%ISR=10E%TI=Z%CI=Z%II=I%TS=U)OPS
+
+    
+    cat nmap_serviceinfo_file_SEQ_1 | wc -l
+    
+    cat nmap_serviceinfo_file_SEQ | grep -i Nmap > nmap_serviceinfo_file_SEQ_2
+        Nmap scan report for fcmdb1p3.femcom.net (10.184.56.13)
+        Nmap scan report for fcmdb1p4.femcom.net (10.184.56.14)
+        Nmap scan report for 10.184.56.15
+
+    cat nmap_serviceinfo_file_SEQ_2 | wc -l
+    
+    paste -d " "  nmap_serviceinfo_file_SEQ_2 nmap_serviceinfo_file_SEQ_1 
+        Nmap scan report for fcmdb1p3.femcom.net (10.184.56.13) OS:x86_64-redhat-linux-gnu)SEQ(SP=103%GCD=1%ISR=10C%TI=Z%CI=Z%II=I%TS=U)OPS
+        Nmap scan report for fcmdb1p4.femcom.net (10.184.56.14) OS:x86_64-redhat-linux-gnu)SEQ(SP=FD%GCD=1%ISR=10A%TI=Z%CI=Z%II=I%TS=U)OPS(
+        Nmap scan report for 10.184.56.15 OS:x86_64-redhat-linux-gnu)SEQ(SP=106%GCD=1%ISR=10E%TI=Z%CI=Z%II=I%TS=U)OPS
+        Nmap scan report for fcmdb2p2.femcom.net (10.184.56.16) OS:x86_64-redhat-linux-gnu)SEQ(SP=FF%GCD=1%ISR=109%TI=Z%CI=Z%II=I%TS=U)OPS(
+
+    paste -d " "  nmap_serviceinfo_file_SEQ_2 nmap_serviceinfo_file_SEQ_1 | awk '{print $5"\t"$6"\t"$7}'
+        fcmdb1p3.femcom.net	(10.184.56.13)	OS:x86_64-redhat-linux-gnu)SEQ(SP=103%GCD=1%ISR=10C%TI=Z%CI=Z%II=I%TS=U)OPS
+        fcmdb1p4.femcom.net	(10.184.56.14)	OS:x86_64-redhat-linux-gnu)SEQ(SP=FD%GCD=1%ISR=10A%TI=Z%CI=Z%II=I%TS=U)OPS(
+        10.184.56.15	OS:x86_64-redhat-linux-gnu)SEQ(SP=106%GCD=1%ISR=10E%TI=Z%CI=Z%II=I%TS=U)OPS	
+        fcmdb2p2.femcom.net	(10.184.56.16)	OS:x86_64-redhat-linux-gnu)SEQ(SP=FF%GCD=1%ISR=109%TI=Z%CI=Z%II=I%TS=U)OPS(
+        fcmdb2p3.femcom.net	(10.184.56.17)	OS:x86_64-redhat-linux-gnu)SEQ(SP=103%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=U)OPS
+    
+    ================================= Opcion 3
+    desde el principio obtengo IP's y Hostnames, ordeno las salidas y posteriormente separo para copy paste.
+            nmap_T4Av_10.184.32.11-250]$ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n
+            nmap_T4Av_10.184.32.11-250]$ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n | grep  f > hostnames
+            nmap_T4Av_10.184.32.11-250]$ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n | grep -v f > ips
+    
+    Opteniento IP e Informacion del sistema que esta corriendo.
+            egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out
+            egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out  > nmap+running
+            cat nmap+running | grep Nmap | wc -l
+            cat nmap+running | grep -i running | wc -l
+            
+    Separamos las salidas de nmap+running (nmap y running), en el caso de Nmap aprovecharemos para limpiar la salida y 
+    solo obtener los hostname y las ip 
+    
+            cat nmap+running | grep -i running > nmap+running+running
+                Running (JUST GUESSING) : Linux 2.6.X|2.4.X (91%), AXIS Linux 2.6.X (91%), Crestron 2-Series (89%), Toshiba Linux 2.4.X (89%), Linksys Linux 2.4.X (88%), Check Point embedded (88%), Check Point Linux 2.4.X (88%)
+                Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
+                Running: Microsoft Windows Vista|2008|7
+                No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
+
+              	
+            cat nmap+running | grep Nmap | awk '{print $5"\t"$6}'
+                fcommsg05.comercio.fne	(10.184.32.11)
+                fcfarprd1.comercio.fne	(10.184.32.13)
+                10.184.32.14	
+                10.184.32.15  
+                
+    Unimos files en una sola fila.
+            paste -d " " nmap+running+ip nmap+running+running
+            
+            paste -d " " nmap+running+ip nmap+running+running  | wc -l
+            48
+            paste -d " " nmap+running+ip nmap+running+running  > nmap+nmaprunning
+            
+            cat nmap+nmaprunning
+                fcmtygw1.comercio.fne	(10.184.32.44) Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
+                10.184.32.45	 Running: Microsoft Windows Vista|2008|7
+                fcultdbqa1.femcom.net	(10.184.32.46) No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
+                fcowfuqa01.comercio.fne	(10.184.32.47) Running: Microsoft Windows Vista|2008|7
+                
+    Extrayendo todos los "Service Info"
+            egrep -i -e "nmap scan report for" -e "Service Info:" nmap_T4Av_10.184.32.11-250.out | grep "Service Info:" -B1 > Service_Info_all
+            cat Service_Info_all
+            
+            cat Service_Info_all | grep Nmap
+            cat Service_Info_all | grep Nmap | wc -l
+            
+            cat Service_Info_all | grep Service
+            cat Service_Info_all | grep Service | wc -l
+            
+            cat Service_Info_all | grep Nmap > Service_Info_all_nmap
+            cat Service_Info_all | grep Service > Service_Info_all_service
+            
+            cat Service_Info_all_nmap 
+            cat Service_Info_all_nmap  | wc -l
+            
+            cat Service_Info_all_service 
+            cat Service_Info_all_service  | wc -l
+    
+    Uniendo todo en una sola fila
+            paste -d " " Service_Info_all_nmap Service_Info_all_service | awk '{print $5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12"\t"$13"\t"$14"\t"$15"\t"$16"\t"$17}' > nmap+serviceinfo_ok
+    
+    Filtramos y acomodamos
+            Service	Info:	OS:	Windows		
+            Service	Info:	OS:	Windows		
+            Service	Info:	OS:	Windows	
+            
+    Extraemos Secuencias
+                
+            egrep -i -e "nmap scan report for" -e "OS:x86_64-redhat-linux-gnu" nmap_T4Av_10.184.32.11-250.out  | grep "OS:x86_64-redhat-linux-gnu" -B1
+                Nmap scan report for fcowldes06.femcom.net (10.184.32.50)
+                OS:x86_64-redhat-linux-gnu)SEQ(SP=FF%GCD=1%ISR=10A%TI=Z%CI=Z%II=I%TS=U)OPS(
+                
+                Nmap scan report for fcowldes07.femcom.net (10.184.32.51)
+                OS:x86_64-redhat-linux-gnu)SEQ(SP=108%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=U)OPS
+
+    
 
 
-    
-    
-    
+        
+
     
     
     
