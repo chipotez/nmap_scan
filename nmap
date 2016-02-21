@@ -51,4 +51,34 @@ Ejemplo de Salida:
         Nmap done: 254 IP addresses (**161 hosts up**) scanned in 29.85 seconds
     
     
+    ejecutaremos otro filtro hasta que coincidan las salidas de cada busqueda ya que es la unica 
+    forma en la cual podremos identificar cada equipos 
+    
+    
+    sacamos todas las ip
+    egrep -i -e "nmap scan report for" nmap_T4Av_10.184.56.11-250.out
+    
+    sacamos la de los sistemas que estan corriendo en cada equipo
+    egrep -i -e "running" nmap_T4Av_10.184.56.11-250.out
+    
+    egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.56.11-250.out | grep -i "running" | wc -l
+        71
+    egrep -i -e "running" nmap_T4Av_10.184.56.11-250.out | grep -i "running" | wc -l
+        71
+    egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.56.11-250.out | grep -i "running" | wc -l
+        142
+    
+    Filtramos, ordenamos y mostramos los hostname e ip
+    egrep -i -e "nmap scan report for" nmap_T4Av_10.184.56.11-250.out  | awk '{print $5"\t"$6}' | sort -n
+        fcrmsp02.femcom.net	(10.184.56.64)
+        fctabprd01.comercio.fne	(10.184.56.85)
+        test2.femcom.net	(10.184.56.33)
+        10.184.56.100	
+        10.184.56.101	
+        10.184.56.102	
+    
+    Validamos que sean las lineas correctas con los datos que obtenimos de los scan de nmap.
+   egrep -i -e "nmap scan report for" nmap_T4Av_10.184.56.11-250.out  | awk '{print $5"\t"$6}' | sort -n | wc -l
+        71
+   
     
