@@ -194,7 +194,7 @@ Ejemplo de Salida:
     ok .- Tomar las salidas anteriores y guardar 
 
     
-    ok .- Opteniento IP e Informacion del sistema que esta corriendo.
+    ok .- Opteniento IP e Informacion del sistema que esta corriendo "Running OS".
             egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out
             egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out | wc -l
             egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out  > nmap_running
@@ -204,22 +204,23 @@ Ejemplo de Salida:
     Separamos las salidas de nmap_running (nmap y running), en el caso de Nmap aprovecharemos para limpiar la salida y 
     solo obtener los hostname y las ip 
     
-    ok .-        cat nmap_running | grep -i running > nmap_running_running
+    ok .-       cat nmap_running | grep -i running > nmap_running_running
                 Running (JUST GUESSING) : Linux 2.6.X|2.4.X (91%), AXIS Linux 2.6.X (91%), Crestron 2-Series (89%), Toshiba Linux 2.4.X (89%), Linksys Linux 2.4.X (88%), Check Point embedded (88%), Check Point Linux 2.4.X (88%)
                 Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
                 Running: Microsoft Windows Vista|2008|7
                 No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
 
               	
-    ok .-        cat nmap_running | grep Nmap | awk '{print $5"\t"$6}' > nmap_running_ip
+    ok .-        cat nmap_running | grep Nmap > nmap_running_ip
                 fcommsg05.comercio.fne	(10.184.32.11)
                 fcfarprd1.comercio.fne	(10.184.32.13)
                 10.184.32.14	
                 10.184.32.15  
-    nmap_running_ip contiene ip y hostname procederemos a limpiar que queden solo IP:
-    (hast aeste punto tenemos todas las ips limpias pero en archivos separados, falta unirlos)
-    ok .-       grep f  nmap_running_ip | awk '{print $2}' > nmap_running_ip_hostnames
-    ok .-       grep -v f  nmap_running_ip > nmap_running_ip_ip
+                
+#    nmap_running_ip contiene ip y hostname procederemos a limpiar que queden solo IP:
+#    (hast aeste punto tenemos todas las ips limpias pero en archivos separados, falta unirlos)
+#           grep f  nmap_running_ip | awk '{print $2}' > nmap_running_ip_hostnames
+#           grep -v f  nmap_running_ip > nmap_running_ip_ip
                 
     
     Unimos files en una sola fila.
@@ -228,15 +229,16 @@ Ejemplo de Salida:
     ok .-       paste -d " " nmap_running_ip nmap_running_running  | wc -l
                     48
     ok .-       paste -d " " nmap_running_ip nmap_running_running  > nmap_nmaprunning
-            
-    ok .-       cat nmap_nmaprunning
+    ok .-       awk '{$1=$2=$3=$4=""; sub ("    ","");print$0 }' nmap_nmaprunning > line_runningfull        
+ 
+           cat nmap_nmaprunning
                     fcmtygw1.comercio.fne	(10.184.32.44) Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
                     10.184.32.45	 Running: Microsoft Windows Vista|2008|7
                     fcultdbqa1.femcom.net	(10.184.32.46) No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
                     fcowfuqa01.comercio.fne	(10.184.32.47) Running: Microsoft Windows Vista|2008|7
     
     Segmentamos la información para mayor facilidad dentro de excel
-    ok .-       cat nmap_nmaprunning | sort -n | grep -i fc
+           cat nmap_nmaprunning | sort -n | grep -i fc
                     fciscope.comercio.fne	(10.184.16.56) No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
                     fcmcas03.comercio.fne	(10.184.16.31) Running: Microsoft Windows 2003
                     fcmcas04.comercio.fne	(10.184.16.32) Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
@@ -260,7 +262,7 @@ Ejemplo de Salida:
     ok .-        cat Service_Info_all | grep Service | wc -l
             
     ok .-        cat Service_Info_all | grep Nmap > Service_Info_all_nmap
-    ok .-        cat Service_Info_all | grep Service > Service_Info_all_service aqui vamos
+    ok .-        cat Service_Info_all | grep Service > Service_Info_all_service
             
     ok .-        cat Service_Info_all_nmap 
     ok .-        cat Service_Info_all_nmap  | wc -l
@@ -269,7 +271,14 @@ Ejemplo de Salida:
     ok .-        cat Service_Info_all_service  | wc -l
     
     Uniendo todo en una sola fila
-    ok .-       paste -d " " Service_Info_all_nmap Service_Info_all_service | awk '{print $5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12"\t"$13"\t"$14"\t"$15"\t"$16"\t"$17}' > nmap+serviceinfo_ok
+    ok .-       paste -d " " Service_Info_all_nmap Service_Info_all_service > nmap_serviceinfo_ok
+                awk '{$1=$2=$3=$4=""; sub ("   ","");print$0 }' nmap_serviceinfo_ok 
+                
+    
+#    Opcional para la limpieza el parametro sub("","") es para los espacios que genera el saltarce columnas.
+#                paste -d " " Service_Info_all_nmap Service_Info_all_service > Columna1 
+#                awk '{$1=$2=$3=$4="";sub("    ","");print $0}' Columna1 | sort -n
+#                awk '{$1=$2=$3=$4="";sub("    ", ""); print }' nmap_serviceinfo_ok | grep  fc| wc -l
     
     Filtramos y acomodamos
             Service	Info:	OS:	Windows		
@@ -292,6 +301,7 @@ Ejemplo de Salida:
 
     ok .-   paste -d " " seqF2 seqF1 | awk '{print $5"\t"$6"\t"$7}' | grep -v f
     ok .-   paste -d " " seqF2 seqF1 | awk '{print $5"\t"$6"\t"$7}' | grep f
+    ok .-   paste -d " " seqF2 seqF1 | awk '{print $5"\t"$6"\t"$7}'  > seqFull
 
     Extraemos Informacion de ssh
     ok .-   egrep -i -e "nmap scan report for" -e "22/tcp" nmap_T4Av_10.184.16.11-250.out  | grep "22/tcp" -B1 > ssh
@@ -303,7 +313,7 @@ Ejemplo de Salida:
     ok .-   cat ssh | grep "Nmap" > ssh2
     
     ok.-    paste -d " " ssh2 ssh1
-
+    ok .-   paste -d " " ssh2 ssh1 > sshFull
 
 
         
