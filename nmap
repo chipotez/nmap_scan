@@ -183,67 +183,93 @@ Ejemplo de Salida:
         fcmdb2p3.femcom.net	(10.184.56.17)	OS:x86_64-redhat-linux-gnu)SEQ(SP=103%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=U)OPS
     
     ================================= Opcion 3
-    desde el principio obtengo IP's y Hostnames, ordeno las salidas y posteriormente separo para copy paste.
-            nmap_T4Av_10.184.32.11-250]$ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n
-            nmap_T4Av_10.184.32.11-250]$ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n | grep  f > hostnames
-            nmap_T4Av_10.184.32.11-250]$ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n | grep -v f > ips
     
-    Opteniento IP e Informacion del sistema que esta corriendo.
+    
+    
+    Ok .- Desde el principio obtengo IP's y Hostnames, ordeno las salidas y posteriormente separo para copy paste.
+            $ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n
+            $ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n | grep  f > hostnames
+            $ egrep -i -e "Nmap scan report for" nmap_T4Av_10.184.32.11-250.out | awk '{print $5"\t"$6}' | sort -n | grep -v f > ips
+    
+    ok .- Tomar las salidas anteriores y guardar 
+
+    
+    ok .- Opteniento IP e Informacion del sistema que esta corriendo.
             egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out
-            egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out  > nmap+running
-            cat nmap+running | grep Nmap | wc -l
-            cat nmap+running | grep -i running | wc -l
+            egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out | wc -l
+            egrep -i -e "Nmap scan report for" -e "running" nmap_T4Av_10.184.32.11-250.out  > nmap_running
+            cat nmap_running | grep Nmap | wc -l
+            cat nmap_running | grep -i running | wc -l
             
-    Separamos las salidas de nmap+running (nmap y running), en el caso de Nmap aprovecharemos para limpiar la salida y 
+    Separamos las salidas de nmap_running (nmap y running), en el caso de Nmap aprovecharemos para limpiar la salida y 
     solo obtener los hostname y las ip 
     
-            cat nmap+running | grep -i running > nmap+running+running
+    ok .-        cat nmap_running | grep -i running > nmap_running_running
                 Running (JUST GUESSING) : Linux 2.6.X|2.4.X (91%), AXIS Linux 2.6.X (91%), Crestron 2-Series (89%), Toshiba Linux 2.4.X (89%), Linksys Linux 2.4.X (88%), Check Point embedded (88%), Check Point Linux 2.4.X (88%)
                 Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
                 Running: Microsoft Windows Vista|2008|7
                 No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
 
               	
-            cat nmap+running | grep Nmap | awk '{print $5"\t"$6}'
+    ok .-        cat nmap_running | grep Nmap | awk '{print $5"\t"$6}' > nmap_running_ip
                 fcommsg05.comercio.fne	(10.184.32.11)
                 fcfarprd1.comercio.fne	(10.184.32.13)
                 10.184.32.14	
                 10.184.32.15  
+    nmap_running_ip contiene ip y hostname procederemos a limpiar que queden solo IP:
+    (hast aeste punto tenemos todas las ips limpias pero en archivos separados, falta unirlos)
+    ok .-       grep f  nmap_running_ip | awk '{print $2}' > nmap_running_ip_hostnames
+    ok .-       grep -v f  nmap_running_ip > nmap_running_ip_ip
                 
+    
     Unimos files en una sola fila.
-            paste -d " " nmap+running+ip nmap+running+running
+    ok .-       paste -d " " nmap_running_ip nmap_running_running
             
-            paste -d " " nmap+running+ip nmap+running+running  | wc -l
-            48
-            paste -d " " nmap+running+ip nmap+running+running  > nmap+nmaprunning
+    ok .-       paste -d " " nmap_running_ip nmap_running_running  | wc -l
+                    48
+    ok .-       paste -d " " nmap_running_ip nmap_running_running  > nmap_nmaprunning
             
-            cat nmap+nmaprunning
-                fcmtygw1.comercio.fne	(10.184.32.44) Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
-                10.184.32.45	 Running: Microsoft Windows Vista|2008|7
-                fcultdbqa1.femcom.net	(10.184.32.46) No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
-                fcowfuqa01.comercio.fne	(10.184.32.47) Running: Microsoft Windows Vista|2008|7
-                
+    ok .-       cat nmap_nmaprunning
+                    fcmtygw1.comercio.fne	(10.184.32.44) Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
+                    10.184.32.45	 Running: Microsoft Windows Vista|2008|7
+                    fcultdbqa1.femcom.net	(10.184.32.46) No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
+                    fcowfuqa01.comercio.fne	(10.184.32.47) Running: Microsoft Windows Vista|2008|7
+    
+    Segmentamos la información para mayor facilidad dentro de excel
+    ok .-       cat nmap_nmaprunning | sort -n | grep -i fc
+                    fciscope.comercio.fne	(10.184.16.56) No exact OS matches for host (If you know what OS is running on it, see http://nmap.org/submit/ ).
+                    fcmcas03.comercio.fne	(10.184.16.31) Running: Microsoft Windows 2003
+                    fcmcas04.comercio.fne	(10.184.16.32) Running (JUST GUESSING) : Microsoft Windows Vista|2008|7|Longhorn (97%)
+
+    ok .-       cat nmap_nmaprunning | sort -n | grep -i -v fc
+                    10.184.16.16	 Running (JUST GUESSING) : Linux 2.6.X|2.4.X (95%), Linksys Linux 2.4.X|2.6.X (94%), Toshiba Linux 2.4.X (91%), Vilar Linux 2.6.X (90%), Cisco ACNS 5.X (89%)
+                    10.184.16.17	 Running (JUST GUESSING) : Linux 2.6.X|2.4.X (95%), Linksys Linux 2.4.X|2.6.X (94%), Toshiba Linux 2.4.X (91%), Vilar Linux 2.6.X (90%), Cisco ACNS 5.X (89%)
+                    10.184.16.18	 Running (JUST GUESSING) : Linux 2.6.X|2.4.X (95%), Linksys Linux 2.4.X|2.6.X (94%), Toshiba Linux 2.4.X (91%), Vilar Linux 2.6.X (90%), Cisco ACNS 5.X (89%)
+    
+    Para excluir las 2 primera columnas y despues muestre todo el resto de columnas
+    ok.-        cat nmap_nmaprunning | sort -n | grep -i fc | awk '{$1=$2="";print $0}'
+
     Extrayendo todos los "Service Info"
-            egrep -i -e "nmap scan report for" -e "Service Info:" nmap_T4Av_10.184.32.11-250.out | grep "Service Info:" -B1 > Service_Info_all
-            cat Service_Info_all
+    ok .-   egrep -i -e "nmap scan report for" -e "Service Info:" nmap_T4Av_10.184.32.11-250.out | grep "Service Info:" -B1 > Service_Info_all
+    ok .-   cat Service_Info_all
             
-            cat Service_Info_all | grep Nmap
-            cat Service_Info_all | grep Nmap | wc -l
+    ok .-        cat Service_Info_all | grep Nmap
+    ok .-        cat Service_Info_all | grep Nmap | wc -l
             
-            cat Service_Info_all | grep Service
-            cat Service_Info_all | grep Service | wc -l
+    ok .-        cat Service_Info_all | grep Service
+    ok .-        cat Service_Info_all | grep Service | wc -l
             
-            cat Service_Info_all | grep Nmap > Service_Info_all_nmap
-            cat Service_Info_all | grep Service > Service_Info_all_service
+    ok .-        cat Service_Info_all | grep Nmap > Service_Info_all_nmap
+    ok .-        cat Service_Info_all | grep Service > Service_Info_all_service aqui vamos
             
-            cat Service_Info_all_nmap 
-            cat Service_Info_all_nmap  | wc -l
+    ok .-        cat Service_Info_all_nmap 
+    ok .-        cat Service_Info_all_nmap  | wc -l
             
-            cat Service_Info_all_service 
-            cat Service_Info_all_service  | wc -l
+    ok .-        cat Service_Info_all_service 
+    ok .-        cat Service_Info_all_service  | wc -l
     
     Uniendo todo en una sola fila
-            paste -d " " Service_Info_all_nmap Service_Info_all_service | awk '{print $5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12"\t"$13"\t"$14"\t"$15"\t"$16"\t"$17}' > nmap+serviceinfo_ok
+    ok .-       paste -d " " Service_Info_all_nmap Service_Info_all_service | awk '{print $5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12"\t"$13"\t"$14"\t"$15"\t"$16"\t"$17}' > nmap+serviceinfo_ok
     
     Filtramos y acomodamos
             Service	Info:	OS:	Windows		
@@ -252,14 +278,32 @@ Ejemplo de Salida:
             
     Extraemos Secuencias
                 
-            egrep -i -e "nmap scan report for" -e "OS:x86_64-redhat-linux-gnu" nmap_T4Av_10.184.32.11-250.out  | grep "OS:x86_64-redhat-linux-gnu" -B1
+    ok .-   egrep -i -e "nmap scan report for" -e "OS:x86_64-redhat-linux-gnu" nmap_T4Av_10.184.32.11-250.out  | grep "OS:x86_64-redhat-linux-gnu" -B1 > Seq1
                 Nmap scan report for fcowldes06.femcom.net (10.184.32.50)
                 OS:x86_64-redhat-linux-gnu)SEQ(SP=FF%GCD=1%ISR=10A%TI=Z%CI=Z%II=I%TS=U)OPS(
                 
                 Nmap scan report for fcowldes07.femcom.net (10.184.32.51)
                 OS:x86_64-redhat-linux-gnu)SEQ(SP=108%GCD=1%ISR=10B%TI=Z%CI=Z%II=I%TS=U)OPS
+                
+                
+    Unimos secuencias con IP
+    ok .-   cat Seq1  | grep OS > seqF1
+    ok .-   cat Seq1  | grep Nmap > seqF2
 
+    ok .-   paste -d " " seqF2 seqF1 | awk '{print $5"\t"$6"\t"$7}' | grep -v f
+    ok .-   paste -d " " seqF2 seqF1 | awk '{print $5"\t"$6"\t"$7}' | grep f
+
+    Extraemos Informacion de ssh
+    ok .-   egrep -i -e "nmap scan report for" -e "22/tcp" nmap_T4Av_10.184.16.11-250.out  | grep "22/tcp" -B1 > ssh
     
+    ok .-   cat ssh | grep Nmap | wc -l
+    ok .-   cat ssh | grep 22/tcp | wc -l
+    
+    ok .-   cat ssh | grep "22/tcp" > ssh1
+    ok .-   cat ssh | grep "Nmap" > ssh2
+    
+    ok.-    paste -d " " ssh2 ssh1
+
 
 
         
